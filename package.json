@@ -1,0 +1,30 @@
+{
+  "name": "velivole-animation",
+  "version": "1.0.0",
+  "description": "Animations for velivole",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --mode=development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mmomtchev/velivole-animations.git"
+  },
+  "author": "Momtchil Momtchev <momtchil@momtchev.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/mmomtchev/velivole-animations/issues"
+  },
+  "homepage": "https://github.com/mmomtchev/velivole-animations#readme",
+  "devDependencies": {
+    "css-loader": "^6.7.3",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.2",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.2",
+    "webpack": "^5.76.3",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.13.1"
+  }
+}
