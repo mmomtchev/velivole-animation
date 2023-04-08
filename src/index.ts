@@ -2,14 +2,15 @@ const WIDTH = 1280;
 const HEIGHT = 720;
 const MOLECULE = HEIGHT / 320;
 const RADIUS = HEIGHT / 4;
-const NUMBER = Math.round((2 * RADIUS * RADIUS * Math.PI) / 100 / (2 * MOLECULE * MOLECULE * Math.PI));
-const AMBIENT = NUMBER * 8;
+const MOLECULES_INSIDE = Math.round((2 * RADIUS * RADIUS * Math.PI) / 100 / (2 * MOLECULE * MOLECULE * Math.PI));
+const MOLECULES_OUTSIDE = MOLECULES_INSIDE * 8;
 const SPEED = 2.5;
 const DURATION = 32;
 const SCALE = false;
-const INFLATE = false;
+const INFLATE = true;
+const WATER_INSIDE = MOLECULES_INSIDE / 10;
 
-const PRESSURE_RATIO = NUMBER / AMBIENT * 2.5 / RADIUS;
+const PRESSURE_RATIO = MOLECULES_INSIDE / MOLECULES_OUTSIDE * 2.5 / RADIUS;
 
 const FRAMEPERIOD = 1000 / 50;
 
@@ -23,29 +24,36 @@ type Molecule = {
   speed: number;
   x: number;
   y: number;
+  color: string;
 };
 
-const molecules = Array.apply(null, Array(NUMBER)).map(() => {
-  const r = Math.random() * baloon;
+const makeMolecule = (color: string, rIn: number, rOut: number) => {
+  const r = rIn + Math.random() * (rOut - rIn);
   const a = Math.random() * 2 * Math.PI;
   return {
     direction: Math.random() * 2 * Math.PI,
     speed: SPEED,
     x: Math.cos(a) * r,
-    y: Math.sin(a) * r
+    y: Math.sin(a) * r,
+    color
   } as Molecule;
+}
+
+const molecules = Array.apply(null, Array(MOLECULES_INSIDE)).map((_, i) => {
+  let color = '';
+  if (i % 5 == 0)
+    color = 'tomato';
+  else
+    color = 'lightskyblue';
+  return makeMolecule(i % 5 == 0 ? 'tomato' : 'lightskyblue', baloon, 0);
 });
 
-const ambient = Array.apply(null, Array(AMBIENT)).map(() => {
-  const r = baloon + Math.random() * baloon;
-  const a = Math.random() * 2 * Math.PI;
-  return {
-    direction: Math.random() * 2 * Math.PI,
-    speed: 2.5,
-    x: Math.cos(a) * r,
-    y: Math.sin(a) * r
-  } as Molecule;
+const ambient = Array.apply(null, Array(MOLECULES_OUTSIDE)).map((_, i) => {
+  return makeMolecule(i % 5 == 0 ? 'tomato' : 'lightskyblue', baloon * 2, baloon);
 });
+
+for (let i = 0; i < WATER_INSIDE; i++)
+  molecules.push(makeMolecule('mediumblue', baloon, 0));
 
 function toDeg(r: number): number {
   return r / Math.PI * 180;
@@ -72,10 +80,7 @@ function drawMolecules() {
 
   for (const m of [...molecules, ...ambient]) {
     ctx.beginPath();
-    if (c % 5 == 0)
-      ctx.fillStyle = 'tomato';
-    else
-      ctx.fillStyle = 'dodgerblue';
+    ctx.fillStyle = m.color;
     c++;
     ctx.arc(m.x, m.y, MOLECULE, 0, 2 * Math.PI);
     ctx.fill();
@@ -110,7 +115,7 @@ function moveMolecule(m: Molecule, insideWall: number, outsideWall: number) {
 }
 
 function moveMolecules() {
-  const pressure = (NUMBER / AMBIENT * SPEED / baloon) / PRESSURE_RATIO;
+  const pressure = ((MOLECULES_INSIDE + WATER_INSIDE) / MOLECULES_OUTSIDE * SPEED / baloon) / PRESSURE_RATIO;
   if (INFLATE)
     baloon = baloon + baloon * (pressure - 1) / 250;
 
